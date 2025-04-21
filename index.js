@@ -66,6 +66,22 @@ wss.on("connection", (ws) => {
             }
           }
         }
+      } else if (data.type === "clear") {
+        // Clear chat log
+        fs.writeFileSync(chatLogFile, "", (err) => {
+          if (err) {
+            console.error("Error clearing file:", err);
+          } else {
+            console.log("Chat log cleared.");
+          }
+        });
+        // Notify all clients about the chat log clearance
+        const clearMessage = "Chat log has been cleared.";
+        for (let [client, clientName] of clients) {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(clearMessage);
+          }
+        }
       }
     } catch (error) {
       console.error("Invalid message received:", messageStr);
